@@ -1,0 +1,15 @@
+## ignore source code zip files
+*.zip
+
+## ignore baby example
+example/
+
+# ignore extracted source code folder
+*_src/
+
+# Visual Studio
+Debug/
+Release/
+.vs/
+*.vcxproj*
+*.sln
