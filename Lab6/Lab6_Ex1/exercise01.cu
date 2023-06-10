@@ -166,7 +166,8 @@ int main(int argc, char **argv)
 		cudaSetDevice(dev);
 		cudaDeviceProp deviceProp;
 		cudaGetDeviceProperties(&deviceProp, dev);
-		occupancy = (deviceProp.maxBlocksPerMultiProcessor * threads.x * threads.y * threads.z) / (float)(deviceProp.maxThreadsPerMultiProcessor * deviceProp.multiProcessorCount);
+		occupancy = (deviceProp.maxBlocksPerMultiProcessor * threads.x * threads.y * threads.z) 
+			/ (float)(deviceProp.maxThreadsPerMultiProcessor); // max active (threads or warps) / total (threads or warps) in a SMP
 	}
 
 	// Copy result from device to host

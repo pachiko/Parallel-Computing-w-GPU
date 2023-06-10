@@ -189,7 +189,8 @@ int main(int argc, char **argv)
 		cudaGetDeviceProperties(&deviceProp, dev);
 		int maxActiveBlocksPerMP;
 		cudaOccupancyMaxActiveBlocksPerMultiprocessor(&maxActiveBlocksPerMP, matrixMulCUDASharedMemory, blockSize * blockSize, 0);
-		occupancy = (float)maxActiveBlocksPerMP * blockSize * blockSize / (deviceProp.maxThreadsPerMultiProcessor); // max active (threads or warps) / total (threads or warps)
+		occupancy = maxActiveBlocksPerMP * blockSize * blockSize 
+			/ (float)(deviceProp.maxThreadsPerMultiProcessor); // max active (threads or warps) / total (threads or warps) in a SMP
 	}
 
 	// Copy result from device to host
