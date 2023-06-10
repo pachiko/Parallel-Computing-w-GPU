@@ -7,6 +7,9 @@ example/
 # ignore extracted source code folder
 *_src/
 
+# ignore extracted solution code folder
+*_sln/
+
 # Visual Studio
 Debug/
 Release/
