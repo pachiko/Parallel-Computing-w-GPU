@@ -38,9 +38,9 @@ __device__ float sphere_intersect(Sphere *s, float ox, float oy, float *n) {
 	if (dx*dx + dy*dy < radius*radius) {
 		float dz = sqrtf(radius*radius - dx*dx - dy*dy);
 		*n = dz / sqrtf(radius * radius);
-		return dz + s->z;
+		return s->z - dz;
 	}
-	return -INF;
+	return INF;
 }
 
 __device__ float sphere_intersect_read_only(Sphere const* __restrict__ s, float ox, float oy, float* n) {
@@ -50,9 +50,9 @@ __device__ float sphere_intersect_read_only(Sphere const* __restrict__ s, float 
 	if (dx * dx + dy * dy < radius * radius) {
 		float dz = sqrtf(radius * radius - dx * dx - dy * dy);
 		*n = dz / sqrtf(radius * radius);
-		return dz + s->z;
+		return s->z - dz;
 	}
-	return -INF;
+	return INF;
 }
 
 __global__ void ray_trace(uchar4 *image, Sphere *d_s) {
@@ -64,17 +64,17 @@ __global__ void ray_trace(uchar4 *image, Sphere *d_s) {
 	float   oy = (y - IMAGE_DIM / 2.0f);
 
 	float   r = 0, g = 0, b = 0;
-	float   maxz = -INF;
+	float   minz = INF;
 	for (int i = 0; i<d_sphere_count; i++) {
 		Sphere *s = &d_s[i];
 		float   n;
 		float   t = sphere_intersect(s, ox, oy, &n);
-		if (t > maxz) {
+		if (t < minz) {
 			float fscale = n;
 			r = s->r * fscale;
 			g = s->g * fscale;
 			b = s->b * fscale;
-			maxz = t;
+			minz = t;
 		}
 	}
 
@@ -93,17 +93,17 @@ __global__ void ray_trace_read_only(uchar4* image, Sphere const* __restrict__ d_
 	float   oy = (y - IMAGE_DIM / 2.0f);
 
 	float   r = 0, g = 0, b = 0;
-	float   maxz = -INF;
+	float   minz = INF;
 	for (int i = 0; i < d_sphere_count; i++) {
 		Sphere const* __restrict__ s = &d_s[i];
 		float   n;
 		float   t = sphere_intersect_read_only(s, ox, oy, &n);
-		if (t > maxz) {
+		if (t < minz) {
 			float fscale = n;
 			r = s->r * fscale;
 			g = s->g * fscale;
 			b = s->b * fscale;
-			maxz = t;
+			minz = t;
 		}
 	}
 
@@ -122,17 +122,17 @@ __global__ void ray_trace_constant(uchar4* image) {
 	float   oy = (y - IMAGE_DIM / 2.0f);
 
 	float   r = 0, g = 0, b = 0;
-	float   maxz = -INF;
+	float   minz = INF;
 	for (int i = 0; i < d_sphere_count; i++) {
 		Sphere* s = &d_sphere_constant[i];
 		float   n;
 		float   t = sphere_intersect(s, ox, oy, &n);
-		if (t > maxz) {
+		if (t < minz) {
 			float fscale = n;
 			r = s->r * fscale;
 			g = s->g * fscale;
 			b = s->b * fscale;
-			maxz = t;
+			minz = t;
 		}
 	}
 
